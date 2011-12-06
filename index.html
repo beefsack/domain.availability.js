@@ -3,7 +3,7 @@
   <head>
     <title>domain.availability.js example</title>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script type="text/javascript" src="domain.availability.js"></script>
+    <script type="text/javascript" src="../domain.availability.js"></script>
     <script type="text/javascript">
 function DomainAvailabilityExample() {}
 DomainAvailabilityExample.check = function(domain, target, options) {
@@ -25,22 +25,68 @@ DomainAvailabilityExample.check = function(domain, target, options) {
     }
   });
 }
+DomainAvailabilityExample.check_with_output = function(domains, target) {
+  target.html('');
+  for (var domain_offset in domains) {
+    var domain = jQuery.trim(domains[domain_offset]);
+    if (domain === "") continue;
+    DomainAvailabilityExample.check(domain, target, {
+      append: true
+    });
+  }
+}
+DomainAvailabilityExample.get_combinations = function(sets) {
+  if (sets.length === 1) return sets[0].map(function(item) {
+    return [item];
+  });
+  var current_set = sets.shift();
+  var sub_combinations = this.get_combinations(sets);
+  var combinations = [];
+  for (var current_set_offset in current_set) {
+    var current_item = current_set[current_set_offset];
+    for (var sub_combination_offset in sub_combinations) {
+      var row = sub_combinations[sub_combination_offset].slice();
+      row.unshift(current_item);
+      combinations.push(row);
+    }
+  }
+  return combinations;
+}
 jQuery(document).ready(function() {
-  jQuery('#domain_avaiable_single_search_form').bind('submit', function(e) {
+  jQuery('#domain_available_single_search_form').bind('submit', function(e) {
     DomainAvailabilityExample.check(jQuery(this).find('[name="domain"]').val(),
-	jQuery(this).closest('.domain_avaiable_search').find('.domain_avaiable_result'));
+	jQuery(this).find('.domain_available_result'));
     e.preventDefault();
   });
-  jQuery('#domain_avaiable_multiple_search_form').bind('submit', function(e) {
+  jQuery('#domain_available_multiple_search_form').bind('submit', function(e) {
     var domains_string = jQuery(this).find('[name="domain"]').val();
-    var result = jQuery(this).closest('.domain_avaiable_search').find('.domain_avaiable_result');
-    result.html('');
-    var domains = domains_string.split(',');
-    for (var domain_offset in domains) {
-      DomainAvailabilityExample.check(domains[domain_offset], result, {
-	append: true
-      });
+    var domains = domains_string.split(/\s+/);
+    var target = jQuery(this).find('.domain_available_result');
+    DomainAvailabilityExample.check_with_output(domains, target);
+    e.preventDefault();
+  });
+  jQuery('#domain_available_word_set_search_form').bind('submit', function(e) {
+    var word_sets_string = jQuery(this).find('[name="word_sets"]').val();
+    var word_sets_strings = word_sets_string.split(/\n+/);
+    var word_sets = [];
+    for (var word_set_string_offset in word_sets_strings) {
+      var word_set = [];
+      var words = word_sets_strings[word_set_string_offset].split(/ +/);
+      for (var word_offset in words) {
+	word = jQuery.trim(words[word_offset]);
+	if (word === "") continue;
+	word_set.push(word);
+      }
+      if (word_set.length === 0) continue;
+      word_sets.push(word_set);
     }
+    var word_combinations = DomainAvailabilityExample.get_combinations(word_sets);
+    var tld = jQuery(this).find('[name="tld"]').val();
+    var domains = word_combinations.map(function(item) {
+      return item.join('') + '.' + tld;
+    });
+    var target = jQuery(this).find('.domain_available_result');
+    DomainAvailabilityExample.check_with_output(domains, target);
     e.preventDefault();
   });
 });
@@ -82,25 +128,40 @@ jQuery(document).ready(function() {
   font-weight: normal;
   opacity: 0.5;
 }
+textarea {
+  width: 300px;
+  height: 100px;
+}
     </style>
   </head>
   <body>
     <h1>domain.availability.js example</h1>
-    <div class="domain_avaiable_search">
+    <div class="domain_available_search">
       <h2>Search single domain</h2>
-      <form id="domain_avaiable_single_search_form">
-	<input type="text" name="domain"></input>
+      <form id="domain_available_single_search_form">
+	<input type="text" name="domain" value="google.com"></input>
 	<input type="submit" value="Search"></input>
+	<div class="domain_available_result"></div>
       </form>
-      <div class="domain_avaiable_result"></div>
     </div>
-    <div class="domain_avaiable_search">
-      <h2>Search multiple domains (split by commas)</h2>
-      <form id="domain_avaiable_multiple_search_form">
-	<input type="text" name="domain"></input>
+    <div class="domain_available_search">
+      <h2>Search multiple domains (split by whitespace)</h2>
+      <form id="domain_available_multiple_search_form">
+	<textarea name="domain">google.com yahoo.com
+microsoft.com</textarea>
 	<input type="submit" value="Search"></input>
+	<div class="domain_available_result"></div>
       </form>
-      <div class="domain_avaiable_result"></div>
+    </div>
+    <div class="domain_available_search">
+      <h2>Search words combinations (word sets by line, split by spaces) with TLD (split by spaces)</h2>
+      <form id="domain_available_word_set_search_form">
+	<textarea name="word_sets">spam virus malware
+hunter shark assassin</textarea> . 
+	<input type="text" name="tld" value="com"></input>
+	<input type="submit" value="Search"></input>
+	<div class="domain_available_result"></div>
+      </form>
     </div>
   </body>
 </html>
