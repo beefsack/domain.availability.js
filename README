@@ -1,3 +1,6 @@
-A library to query the availability of domain names.
+A library to query the availability of domain names in javascript.
 
-Requires jQuery v1.7.1.
+Requires jQuery v1.7.1
+Interfaces with https://github.com/beefsack/whois_server
+
+Working example: http://beefsack.github.com/domain.availability.js/
