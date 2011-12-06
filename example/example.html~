@@ -1,0 +1,20 @@
+<!DOCTYPE>
+<html>
+  <head>
+    <title>domain.availability.js example</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="../domain.availability.js"></script>
+    <script type="text/javascript">
+function DomainAvailabilityExample() {}
+DomainAvailabilityExample.check = function(url, reference) {
+}
+$(document).ready(function() {
+  alert('smoo');
+});
+    </script>
+  </head>
+  <body>
+    <h1>domain.availability.js example</h1>
+    <h2>Search single domain</h2>
+  </body>
+</html>
