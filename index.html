@@ -32,9 +32,9 @@ jQuery(document).ready(function() {
     e.preventDefault();
   });
   jQuery('#domain_avaiable_multiple_search_form').bind('submit', function(e) {
-    jQuery('.domain_avaiable_result').html('');
     var domains_string = jQuery(this).find('[name="domain"]').val();
     var result = jQuery(this).closest('.domain_avaiable_search').find('.domain_avaiable_result');
+    result.html('');
     var domains = domains_string.split(',');
     for (var domain_offset in domains) {
       DomainAvailabilityExample.check(domains[domain_offset], result, {
