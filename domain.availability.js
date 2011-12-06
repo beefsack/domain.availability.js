@@ -21,8 +21,6 @@ DomainAvailability.check = function(domain, options) {
 	options.unavailable(data);
       }
     },
-    error: function(jqXHR, textStatus, errorThrown) {
-      alert(textStatus);
-    }
+    error: options.error
   });
 };

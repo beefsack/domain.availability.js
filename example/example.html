@@ -6,12 +6,101 @@
     <script type="text/javascript" src="../domain.availability.js"></script>
     <script type="text/javascript">
 function DomainAvailabilityExample() {}
-DomainAvailabilityExample.check = function(url, reference) {
+DomainAvailabilityExample.check = function(domain, target, options) {
+  if (options === undefined) options = {};
+  if (options.append === undefined) options.append = false;
+  var target_el = jQuery('<div class="domain_available_check domain_available_check_checking"></div>');
+  target_el.html(domain)
+  if (!options.append) jQuery(target).html('');
+  jQuery(target).append(target_el);
+  DomainAvailability.check(domain, {
+    available: function(data) {
+      target_el.removeClass('domain_available_check_checking').addClass('domain_available_check_available');
+    },
+    unavailable: function(data) {
+      target_el.removeClass('domain_available_check_checking').addClass('domain_available_check_unavailable');
+    },
+    error: function() {
+      target_el.removeClass('domain_available_check_checking').addClass('domain_available_check_error');
+    }
+  });
 }
+jQuery(document).ready(function() {
+  jQuery('#domain_avaiable_single_search_form').bind('submit', function(e) {
+    DomainAvailabilityExample.check(jQuery(this).find('[name="domain"]').val(),
+	jQuery(this).closest('.domain_avaiable_search').find('.domain_avaiable_result'));
+    e.preventDefault();
+  });
+  jQuery('#domain_avaiable_multiple_search_form').bind('submit', function(e) {
+    jQuery('.domain_avaiable_result').html('');
+    var domains_string = jQuery(this).find('[name="domain"]').val();
+    var result = jQuery(this).closest('.domain_avaiable_search').find('.domain_avaiable_result');
+    var domains = domains_string.split(',');
+    for (var domain_offset in domains) {
+      DomainAvailabilityExample.check(domains[domain_offset], result, {
+	append: true
+      });
+    }
+    e.preventDefault();
+  });
+});
     </script>
+    <style type="text/css">
+.domain_available_check_checking {
+}
+.domain_available_check_checking:after {
+  content: " searching";
+}
+.domain_available_check_available {
+  color: green;
+}
+.domain_available_check_available:after {
+  content: " available";
+}
+.domain_available_check_unavailable {
+  color: red;
+}
+.domain_available_check_unavailable:after {
+  content: " unavailable";
+}
+.domain_available_check_error {
+  color: gray;
+}
+.domain_available_check_error:after {
+  content: " error fetching data";
+}
+.domain_available_check_checking,
+.domain_available_check_available,
+.domain_available_check_unavailable,
+.domain_available_check_error {
+  font-weight: bold;
+}
+.domain_available_check_checking:after,
+.domain_available_check_available:after,
+.domain_available_check_unavailable:after,
+.domain_available_check_error:after {
+  font-weight: normal;
+  opacity: 0.5;
+}
+    </style>
   </head>
   <body>
     <h1>domain.availability.js example</h1>
-    <h2>Search single domain</h2>
+    <div class="domain_avaiable_search">
+      <h2>Search single domain</h2>
+      <form id="domain_avaiable_single_search_form">
+	<input type="text" name="domain"></input>
+	<input type="submit" value="Search"></input>
+      </form>
+      <div class="domain_avaiable_result"></div>
+    </div>
+    <div class="domain_avaiable_search">
+      <h2>Search multiple domains (split by commas)</h2>
+      <form id="domain_avaiable_multiple_search_form">
+	<input type="text" name="domain"></input>
+	<input type="submit" value="Search"></input>
+      </form>
+      <div class="domain_avaiable_result"></div>
+    </div>
   </body>
 </html>

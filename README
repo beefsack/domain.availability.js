@@ -1,1 +1,3 @@
 A library to query the availability of domain names.
+
+Requires jQuery v1.7.1.
